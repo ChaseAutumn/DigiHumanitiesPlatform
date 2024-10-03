@@ -1,0 +1,17 @@
+<!-- app/templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>DigiHumanities Platform</title>
+</head>
+<body>
+    <h1>欢迎来到数字人文平台</h1>
+    <nav>
+        <a href="{{ url_for('main.index') }}">主页</a> |
+        <a href="{{ url_for('main.about') }}">关于我们</a> |
+        <a href="{{ url_for('main.search_raw_data') }}">搜索原始文本</a>
+    </nav>
+</body>
+</html>
