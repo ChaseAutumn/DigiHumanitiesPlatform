@@ -1,5 +1,8 @@
 import os
 import json
+import re
+
+
 
 def fix_json_missing_commas(content):
     import json
@@ -36,6 +39,7 @@ def fix_json_missing_commas(content):
             # 可以在此添加其他修复逻辑
             return content
 
+
 def search_corrupt_sentence(query):
     # 检查查询关键词是否包含 [MASK]
     if '[MASK]' not in query:
@@ -43,6 +47,9 @@ def search_corrupt_sentence(query):
 
     # 预处理查询关键词，将多个 [MASK] 视为一个
     query_processed = query.replace('[MASK]', '[MASK]').replace(' ', '')
+
+    # 构建正则表达式，忽略空格和大小写
+    pattern = re.compile(re.escape(query_processed), re.IGNORECASE)
 
     # 定义文件路径
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -54,17 +61,25 @@ def search_corrupt_sentence(query):
         fixed_json_str = fix_json_missing_commas(content)
         data = json.loads(fixed_json_str)
 
+
     # 查找匹配的记录
     for index, record in enumerate(data):
-        corrupt_sentence_processed = record['corrupt_sentence'].replace('[MASK]', '[MASK]').replace(' ', '')
-        if query_processed in corrupt_sentence_processed:
-            # 获取上下文记录
-            up_context = data[max(0, index - 10):index]
-            down_context = data[index + 1:index + 11]
-            return {
-                'record': record,
-                'up_context': up_context,
-                'down_context': down_context
-            }
+            corrupt_sentence_processed = record['corrupt_sentence'].replace(
+                '[MASK]', '[MASK]').replace(' ', '')
+            if pattern.search(corrupt_sentence_processed):
+                # 高亮处理
+                highlighted_sentence = pattern.sub(
+                    r'<span class="highlight">\g<0></span>', record['corrupt_sentence'].replace(' ', ''))
+                record['highlighted_corrupt_sentence'] = highlighted_sentence
 
+                # 获取上下文记录，并进行高亮处理（可选）
+
+                # 返回结果
+                return {
+                    'record': record,
+                    'up_context': [],  # 同上
+                    'down_context': []  # 同上
+                }
+    
     return {'error': '未找到匹配的记录！'}
+
