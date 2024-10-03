@@ -1,7 +1,8 @@
 # app/routes/main.py
 
 from flask import Blueprint, render_template, request
-from app.utils.search_raw_data import search_raw_txt  # 引入搜索函数
+from app.utils.search_raw_data import search_raw_txt
+from app.utils.search_corrupt_sentence import search_corrupt_sentence  # 引入新的搜索函数
 
 # 定义 Blueprint
 main = Blueprint('main', __name__)
@@ -18,10 +19,16 @@ def about():
 def search_raw_data():
     if request.method == 'POST':
         query = request.form.get('query')
-
-        # 使用实际的搜索函数
         results = search_raw_txt(query)
-
         return render_template('search_raw_data.html', query=query, results=results)
     else:
         return render_template('search_raw_data.html')
+
+@main.route('/search_corrupt_sentence', methods=['GET', 'POST'])
+def search_corrupt_sentence_route():
+    if request.method == 'POST':
+        query = request.form.get('query')
+        results = search_corrupt_sentence(query)
+        return render_template('search_corrupt_sentence.html', query=query, results=results)
+    else:
+        return render_template('search_corrupt_sentence.html')

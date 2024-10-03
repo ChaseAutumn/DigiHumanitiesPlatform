@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: 运行 run.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/run.py",
+            "console": "integratedTerminal",
+            "env": {
+                "FLASK_ENV": "development"  // 可选，设置 Flask 环境变量
+            },
+            "justMyCode": false,  // 可选，调试所有代码，包括第三方库
+            "jinja": true  // 可选，调试 Jinja 模板
+        }
+    ]
+}
