@@ -1,6 +1,5 @@
-# app/utils/search_raw_data.py
-
 import os
+import re
 
 def search_raw_txt(key_word):
     # 定义文件路径
@@ -26,6 +25,9 @@ def search_raw_txt(key_word):
 
     search_results = []
 
+    # 编译正则表达式，忽略大小写
+    pattern = re.compile(re.escape(key_word), re.IGNORECASE)
+
     for idx in indices:
         # 获取前后5个句子的索引范围
         start = max(1, idx - 5)  # 从1开始，避免包括标题
@@ -34,10 +36,19 @@ def search_raw_txt(key_word):
         # 获取上下文句子
         context = lines[start:end]
 
+        # 对当前句子和上下文进行关键词高亮处理
+        highlighted_sentence = pattern.sub(
+            r'<span class="highlight">\g<0></span>', lines[idx])
+
+        highlighted_context = [pattern.sub(
+            r'<span class="highlight">\g<0></span>', line) for line in context]
+
         # 构建结果
         result = {
             'sentence': lines[idx],
-            'context': context
+            'highlighted_sentence': highlighted_sentence,
+            'context': context,
+            'highlighted_context': highlighted_context
         }
         search_results.append(result)
 

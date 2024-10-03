@@ -1,15 +1,19 @@
-<!-- app/templates/search_raw_data.html -->
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <title>搜索原始文本</title>
+    <style>
+        .highlight {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h1>搜索原始文本</h1>
     <form method="post">
-        <input type="text" name="query" placeholder="请输入实体或词语" required>
+        <input type="text" name="query" placeholder="请输入实体或词语" required value="{{ query if query }}">
         <button type="submit">搜索</button>
     </form>
 
@@ -18,11 +22,11 @@
         <h3>文本标题：{{ results.title }}</h3>
         {% for item in results.results %}
             <h4>找到的句子：</h4>
-            <p>{{ item.sentence }}</p>
+            <p>{{ item.highlighted_sentence | safe }}</p>
             <h4>上下文：</h4>
             <p>
-                {% for sentence in item.context %}
-                    {{ sentence }}<br>
+                {% for sentence in item.highlighted_context %}
+                    {{ sentence | safe }}<br>
                 {% endfor %}
             </p>
             <hr>
