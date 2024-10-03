@@ -2,10 +2,7 @@ import os
 import json
 import re
 
-
-
 def fix_json_missing_commas(content):
-    import json
     # 去除所有空白字符，以便检测 '}{' 的出现
     compact_content = ''.join(content.split())
     if '}{' in compact_content:
@@ -39,7 +36,6 @@ def fix_json_missing_commas(content):
             # 可以在此添加其他修复逻辑
             return content
 
-
 def search_corrupt_sentence(query):
     # 检查查询关键词是否包含 [MASK]
     if '[MASK]' not in query:
@@ -61,25 +57,55 @@ def search_corrupt_sentence(query):
         fixed_json_str = fix_json_missing_commas(content)
         data = json.loads(fixed_json_str)
 
-
     # 查找匹配的记录
     for index, record in enumerate(data):
-            corrupt_sentence_processed = record['corrupt_sentence'].replace(
-                '[MASK]', '[MASK]').replace(' ', '')
-            if pattern.search(corrupt_sentence_processed):
-                # 高亮处理
-                highlighted_sentence = pattern.sub(
-                    r'<span class="highlight">\g<0></span>', record['corrupt_sentence'].replace(' ', ''))
-                record['highlighted_corrupt_sentence'] = highlighted_sentence
+        corrupt_sentence_processed = record['corrupt_sentence'].replace(
+            '[MASK]', '[MASK]').replace(' ', '')
+        if pattern.search(corrupt_sentence_processed):
+            # 高亮处理
+            highlighted_sentence = pattern.sub(
+                r'<span class="highlight">\g<0></span>', record['corrupt_sentence'].replace(' ', ''))
+            record['highlighted_corrupt_sentence'] = highlighted_sentence
 
-                # 获取上下文记录，并进行高亮处理（可选）
+            # 获取上下文记录
+            up_context = []
+            down_context = []
 
-                # 返回结果
-                return {
-                    'record': record,
-                    'up_context': [],  # 同上
-                    'down_context': []  # 同上
-                }
-    
+            # 追溯上文
+            up_sentence = record.get('up_sentence')
+            steps = 0
+            while up_sentence and steps < 10:
+                found = False
+                for rec in data:
+                    if rec.get('sentence') == up_sentence:
+                        up_context.append(rec['sentence'])
+                        up_sentence = rec.get('up_sentence')
+                        found = True
+                        break
+                if not found:
+                    break
+                steps += 1
+
+            # 追溯下文
+            down_sentence = record.get('down_sentence')
+            steps = 0
+            while down_sentence and steps < 10:
+                found = False
+                for rec in data:
+                    if rec.get('sentence') == down_sentence:
+                        down_context.append(rec['sentence'])
+                        down_sentence = rec.get('down_sentence')
+                        found = True
+                        break
+                if not found:
+                    break
+                steps += 1
+
+            # 返回结果
+            return {
+                'record': record,
+                'up_context': up_context[::-1],  # 反转列表，使顺序从远到近
+                'down_context': down_context
+            }
+
     return {'error': '未找到匹配的记录！'}
-

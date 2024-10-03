@@ -24,6 +24,15 @@
             border-bottom: 1px solid #ddd;
             padding-bottom: 5px;
         }
+        /* 新增样式 */
+        .centered-sentence {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .centered-sentence .highlight {
+            background-color: yellow;
+        }
     </style>
 </head>
 <body>
@@ -48,19 +57,29 @@
                 <p><strong>下句：</strong>{{ results.record.down_sentence }}</p>
             </div>
 
-            <div class="context-box">
-                <h3>上文记录：</h3>
-                {% for item in results.up_context %}
-                    <p>{{ item.corrupt_sentence }}</p>
-                {% endfor %}
+            {% if results.up_context %}
+                <div class="context-box">
+                    <h3>上文记录：</h3>
+                    {% for sentence in results.up_context %}
+                        <p>{{ sentence }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- 在这里插入高亮显示的修复后句子 -->
+            <div class="centered-sentence">
+                <strong>修复后的句子：</strong>
+                <span class="highlight">{{ results.record.sentence }}</span>
             </div>
 
-            <div class="context-box">
-                <h3>下文记录：</h3>
-                {% for item in results.down_context %}
-                    <p>{{ item.corrupt_sentence }}</p>
-                {% endfor %}
-            </div>
+            {% if results.down_context %}
+                <div class="context-box">
+                    <h3>下文记录：</h3>
+                    {% for sentence in results.down_context %}
+                        <p>{{ sentence }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
         {% endif %}
     {% endif %}
 </body>
