@@ -2,6 +2,7 @@ import os
 import json
 import re
 
+
 def fix_json_missing_commas(content):
     # 去除所有空白字符，以便检测 '}{' 的出现
     compact_content = ''.join(content.split())
@@ -36,7 +37,37 @@ def fix_json_missing_commas(content):
             # 可以在此添加其他修复逻辑
             return content
 
+
+def process_query(query):
+    # 定义正则表达式模式
+    pattern = r'(\[MASK\]|[\u4E00-\u9FFF]| +|[^\u4E00-\u9FFF\[MASK\] ]+)'
+
+    # 将字符串拆分为令牌
+    tokens = re.findall(pattern, query)
+
+    def is_chinese_or_mask(token):
+        return token == '[MASK]' or re.match(r'^[\u4E00-\u9FFF]$', token)
+
+    output_tokens = []
+    prev_is_chinese_or_mask = False
+
+    for token in tokens:
+        if token.strip() == '':
+            # 忽略多余的空格
+            continue
+        current_is_chinese_or_mask = is_chinese_or_mask(token)
+        if prev_is_chinese_or_mask and current_is_chinese_or_mask:
+            output_tokens.append(' ')
+        output_tokens.append(token)
+        prev_is_chinese_or_mask = current_is_chinese_or_mask
+
+    return ''.join(output_tokens)
+
+
 def search_corrupt_sentence(query):
+
+    query = process_query(query)
+
     # 检查查询关键词是否包含 [MASK]
     if '[MASK]' not in query:
         return {'error': '查询关键词必须包含 [MASK]！'}
