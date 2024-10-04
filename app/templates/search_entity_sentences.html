@@ -6,6 +6,11 @@
 <head>
     <meta charset="UTF-8">
     <title>查询实体相关原始句子</title>
+    <style>
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
 </head>
 
 <body>
@@ -20,11 +25,14 @@
         <button type="submit">查询</button>
     </form>
 
-    {% if sentences %}
+    {% if results %}
     <h2>与实体 "{{ entity }}" 相关的原始句子：</h2>
     <ul>
-        {% for sentence in sentences %}
-        <li>{{ sentence }}</li>
+        {% for result in results %}
+        <li>
+            {% set highlighted_sentence = result.sentence | replace(result.entity, '<span class="highlight">' + result.entity + '</span>') %}
+            {{ highlighted_sentence | safe }}
+        </li>
         {% endfor %}
     </ul>
     {% elif entity %}

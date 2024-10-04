@@ -43,7 +43,7 @@ def search_corrupt_sentence_route():
 def search_entity_sentences_route():
     if request.method == 'POST':
         entity = request.form.get('entity')
-        sentences = search_entity_sentences(entity)
-        return render_template('search_entity_sentences.html', entity=entity, sentences=sentences)
+        results = search_entity_sentences(entity)
+        return render_template('search_entity_sentences.html', entity=entity, results=results)
     else:
         return render_template('search_entity_sentences.html')

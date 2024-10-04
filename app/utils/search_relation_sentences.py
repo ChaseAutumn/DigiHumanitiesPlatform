@@ -1,4 +1,4 @@
-# app/utils/search_entity_sentences.py
+# app/utils/search_relation_sentences.py
 
 import os
 import pickle
@@ -13,7 +13,6 @@ KG_DATA_DIR = os.path.join(DATA_DIR, 'kg_data')
 # 定义知识图谱文件路径
 KG_FILEPATH = os.path.join(KG_DATA_DIR, 'knowledge_graph.gpickle')
 
-
 def load_kg(filepath):
     if os.path.exists(filepath):
         with open(filepath, 'rb') as f:
@@ -21,32 +20,28 @@ def load_kg(filepath):
     else:
         return None
 
-
-def search_entity_sentences(entity_name):
+def search_relation_sentences(relation_name):
     kg = load_kg(KG_FILEPATH)
     if kg is None:
         return []
 
     results = []
 
-    # 如果实体在节点中，获取节点的 data
-    if kg.has_node(entity_name):
-        node_data = kg.nodes[entity_name]
-        for obj in node_data.get('data', []):
-            sent_text = obj.get('sentText', '')
-            results.append({
-                'sentence': sent_text,
-                'entity': entity_name
-            })
-
-    # 遍历与该实体相关的边，获取关联的句子
-    for u, v, edge_data in kg.edges(data=True):
-        if u == entity_name or v == entity_name:
+    # 遍历所有的边，查找关系匹配的边
+    for u, v, key, edge_data in kg.edges(data=True, keys=True):
+        if edge_data.get('relation') == relation_name:
+            # 获取关联的原始句子和实体
             for obj in edge_data.get('data', []):
                 sent_text = obj.get('sentText', '')
+                head_entity = u
+                tail_entity = v
+
+                # 将结果添加到列表
                 results.append({
                     'sentence': sent_text,
-                    'entity': entity_name
+                    'head_entity': head_entity,
+                    'tail_entity': tail_entity,
+                    'relation': relation_name
                 })
 
     return results
