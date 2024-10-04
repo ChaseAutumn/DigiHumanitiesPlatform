@@ -1,0 +1,120 @@
+<!-- app/templates/show_subgraph.html -->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>展示知识图谱子图</title>
+    <!-- 引入 Cytoscape.js -->
+    <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+    <style>
+        #cy {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label, input, button {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>展示知识图谱子图</h1>
+    <nav>
+        <a href="{{ url_for('main.index') }}">主页</a> |
+        <a href="{{ url_for('kg_routes.show_subgraph') }}">展示知识图谱子图</a>
+    </nav>
+    <form id="form">
+        <label for="entity">输入实体名称：</label>
+        <input type="text" id="entity" name="entity" required>
+        <label for="depth">深度：</label>
+        <input type="number" id="depth" name="depth" min="1" value="1" required>
+        <button type="submit">查询</button>
+    </form>
+
+    <div id="cy"></div>
+
+    <script>
+        document.getElementById('form').addEventListener('submit', function(e){
+            e.preventDefault();
+            var entity = document.getElementById('entity').value;
+            var depth = document.getElementById('depth').value;
+
+            fetch(`/api/get_subgraph?entity=${encodeURIComponent(entity)}&depth=${depth}`)
+            .then(response => response.json())
+            .then(data => {
+                if(data.error){
+                    alert(data.error);
+                    document.getElementById('cy').innerHTML = '';
+                    return;
+                }
+
+                var cy = cytoscape({
+                    container: document.getElementById('cy'),
+                    elements: data.nodes.concat(data.edges),
+                    style: [
+                        {
+                            selector: 'node',
+                            style: {
+                                'label': 'data(label)',
+                                'text-valign': 'center',
+                                'color': '#fff',
+                                'background-color': '#0074D9',
+                                'width': 'label',
+                                'height': 'label',
+                                'padding': '10px',
+                                'text-wrap': 'wrap',
+                                'text-max-width': 80
+                            }
+                        },
+                        {
+                            selector: 'edge',
+                            style: {
+                                'label': 'data(label)',
+                                'curve-style': 'bezier',
+                                'target-arrow-shape': 'triangle',
+                                'line-color': '#ccc',
+                                'target-arrow-color': '#ccc',
+                                'width': 2,
+                                'text-rotation': 'autorotate',
+                                'font-size': 12,
+                                'text-background-color': '#ffffff',
+                                'text-background-opacity': 0.8
+                            }
+                        }
+                    ],
+                    layout: {
+                        name: 'cose',
+                        idealEdgeLength: 100,
+                        nodeOverlap: 20,
+                        refresh: 20,
+                        fit: true,
+                        padding: 30,
+                        randomize: true,
+                        componentSpacing: 100,
+                        nodeRepulsion: 400000,
+                        edgeElasticity: 100,
+                        nestingFactor: 5,
+                        gravity: 80,
+                        numIter: 1000,
+                        initialTemp: 200,
+                        coolingFactor: 0.95,
+                        minTemp: 1.0
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

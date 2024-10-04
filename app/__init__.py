@@ -1,10 +1,13 @@
+# app/__init__.py
+
 from flask import Flask
+from config import Config
 
 def create_app():
     app = Flask(__name__)
+    app.config.from_object(Config)
 
-    # 从 routes 导入 main 并注册
-    from .routes import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+    from app.routes import register_blueprints
+    register_blueprints(app)
 
     return app
