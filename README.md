@@ -4,7 +4,8 @@
 ## Requirements
 
 ```bash
-pip install -r requirements.txt
+conda env create -f conda_env.yml
+conda activate DHP
 ```
 
 ## Usage
