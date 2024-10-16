@@ -1,0 +1,29 @@
+{% extends "default.html.jinja2" %}
+
+{% block title %}搜索原始文本{% endblock %}
+
+{% block content %}
+<h1>搜索原始文本</h1>
+<form method="post">
+    <input type="text" name="query" placeholder="请输入实体或词语" required value="{{ query if query }}">
+    <button type="submit">搜索</button>
+</form>
+
+{% if results and results.results %}
+<h2>查询结果：{{ query }}</h2>
+<h3>文本标题：{{ results.title }}</h3>
+{% for item in results.results %}
+<h4>找到的句子：</h4>
+<p>{{ item.highlighted_sentence | safe }}</p>
+<h4>上下文：</h4>
+<p>
+    {% for sentence in item.highlighted_context %}
+    {{ sentence | safe }}<br>
+    {% endfor %}
+</p>
+<hr>
+{% endfor %}
+{% elif results %}
+<p>未找到包含“{{ query }}”的句子。</p>
+{% endif %}
+{% endblock %}
