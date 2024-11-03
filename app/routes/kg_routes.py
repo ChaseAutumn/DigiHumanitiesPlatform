@@ -26,4 +26,4 @@ def get_subgraph():
 
 @kg_routes.route('/show_subgraph')
 def show_subgraph():
-    return render_template('show_subgraph.html')
+    return render_template('show_subgraph.html.jinja2')

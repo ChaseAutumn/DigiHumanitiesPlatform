@@ -11,6 +11,6 @@ def search_relation_sentences_route():
     if request.method == 'POST':
         relation = request.form.get('relation')
         results = search_relation_sentences(relation)
-        return render_template('search_relation_sentences.html', relation=relation, results=results)
+        return render_template('search_relation_sentences.html.jinja2', relation=relation, results=results)
     else:
-        return render_template('search_relation_sentences.html')
+        return render_template('search_relation_sentences.html.jinja2')

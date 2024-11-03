@@ -1,0 +1,52 @@
+{% extends "default.html.jinja2" %}
+
+{% block title %}搜索修复标注示例{% endblock %}
+
+{% block content %}
+<h1>搜索修复标注示例</h1>
+<form method="post">
+    <input type="text" name="query" placeholder="请输入包含 [MASK] 的关键词" required value="{{ query if query }}">
+    <button type="submit">搜索</button>
+</form>
+
+{% if results %}
+{% if results.error %}
+<p style="color:red;">{{ results.error }}</p>
+{% else %}
+<div class="result-box">
+    <h2>查询结果：</h2>
+    <h3>匹配的记录：</h3>
+    <p><strong>标题：</strong>{{ results.record.title }}</p>
+    <p><strong>民族：</strong>{{ results.record.nation }}</p>
+    <p><strong>Corrupt Sentence：</strong>{{ results.record.highlighted_corrupt_sentence | safe }}</p>
+    <p><strong>修复后的句子：</strong>{{ results.record.sentence }}</p>
+    <p><strong>上句：</strong>{{ results.record.up_sentence }}</p>
+    <p><strong>下句：</strong>{{ results.record.down_sentence }}</p>
+</div>
+
+{% if results.up_context %}
+<div class="context-box">
+    <h3>上文记录：</h3>
+    {% for sentence in results.up_context %}
+    <p>{{ sentence }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- 在这里插入高亮显示的修复后句子 -->
+<div class="centered-sentence">
+    <strong>修复后的句子：</strong>
+    <span class="highlight">{{ results.record.sentence }}</span>
+</div>
+
+{% if results.down_context %}
+<div class="context-box">
+    <h3>下文记录：</h3>
+    {% for sentence in results.down_context %}
+    <p>{{ sentence }}</p>
+    {% endfor %}
+</div>
+{% endif %}
+{% endif %}
+{% endif %}
+{% endblock %}

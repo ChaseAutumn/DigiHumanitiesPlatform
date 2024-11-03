@@ -1,0 +1,28 @@
+{% extends "default.html.jinja2" %}
+
+{% block title %}查询实体相关原始句子{% endblock %}
+
+{% block content %}
+<h1>查询实体相关原始句子</h1>
+
+<form method="post">
+    <label for="entity">输入实体名称：</label>
+    <input type="text" id="entity" name="entity" required>
+    <button type="submit">查询</button>
+</form>
+
+{% if results %}
+<h2>与实体 "{{ entity }}" 相关的原始句子：</h2>
+<ul>
+    {% for result in results %}
+    <li>
+        {% set highlighted_sentence = result.sentence | replace(result.entity, '<span class="highlight">' +
+            result.entity + '</span>') %}
+        {{ highlighted_sentence | safe }}
+    </li>
+    {% endfor %}
+</ul>
+{% elif entity %}
+<p>未找到与实体 "{{ entity }}" 相关的原始句子。</p>
+{% endif %}
+{% endblock %}

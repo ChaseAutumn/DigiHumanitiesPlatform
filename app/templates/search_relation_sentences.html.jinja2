@@ -1,0 +1,41 @@
+{% extends "default.html.jinja2" %}
+
+{% block title %}查询关系相关原始句子{% endblock %}
+
+{% block content %}
+<h1>查询关系相关原始句子</h1>
+
+<form method="post">
+    <label for="relation">输入关系名称：</label>
+    <input type="text" id="relation" name="relation" required>
+    <button type="submit">查询</button>
+</form>
+
+{% if results %}
+<h2>与关系 "{{ relation }}" 相关的原始句子：</h2>
+<ul>
+    {% for item in results %}
+    <li>
+        {% set highlighted_sentence = item.sentence %}
+        {% set head_entity = item.head_entity %}
+        {% set tail_entity = item.tail_entity %}
+        {% set relation = item.relation %}
+
+        {% set pattern_head = '\\b' + head_entity + '\\b' %}
+        {% set pattern_tail = '\\b' + tail_entity + '\\b' %}
+
+        {% set highlighted_sentence = highlighted_sentence | replace_regex(pattern_head, '<span class="highlight">' +
+            head_entity + '</span>') %}
+        {% set highlighted_sentence = highlighted_sentence | replace_regex(pattern_tail, '<span class="highlight">' +
+            tail_entity + '</span>') %}
+
+        {{ highlighted_sentence | safe }}
+        <br>
+        <small>实体1：{{ head_entity }}，关系：<span class="highlight">{{ relation }}</span>，实体2：{{ tail_entity }}</small>
+    </li>
+    {% endfor %}
+</ul>
+{% elif relation %}
+<p>未找到与关系 "{{ relation }}" 相关的原始句子。</p>
+{% endif %}
+{% endblock %}
